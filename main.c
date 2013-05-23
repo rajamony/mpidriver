@@ -11,7 +11,8 @@ typedef struct {
 } Test;
 
 Test tests[] = {
-	{"helloworld", testHello}, 
+	{"helloworld",	testHello}, 
+	{"memory", 	testMemory}, 
     };
 
 
