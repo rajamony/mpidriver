@@ -1,4 +1,4 @@
 mpidriver
 =========
 
-Driver to test the hpc-controller
+Drivers to test the hpc-controller

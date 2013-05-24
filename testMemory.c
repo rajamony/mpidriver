@@ -17,12 +17,12 @@ testMemory (int taskid, int numtasks, char *options) {
     wordexp ("dummy", &wep, 0);      // Get argv[0] out of the way
     wordexp (options, &wep, WRDE_NOCMD | WRDE_APPEND);
 
-    while ((c = getopt(wep.we_wordc, wep.we_wordv, "n:m:")) != -1) {
+    while ((c = getopt(wep.we_wordc, wep.we_wordv, "n:i:")) != -1) {
         switch (c) {
 	    case 'n':
 		vectorsize = atoi (optarg); // strtol (optarg, NULL, 0);
 		break;
-	    case 'm':
+	    case 'i':
 		numiterations = strtol (optarg, NULL, 0);
 		break;
 	    default:

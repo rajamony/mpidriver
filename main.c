@@ -12,8 +12,9 @@ typedef struct {
 } Test;
 
 Test tests[] = {
-	{"helloworld",	testHello}, 
-	{"memory", 	testMemory}, 
+	{"helloworld",	testHello},
+	{"memory", 	testMemory},
+	{"compute", 	testCompute},
     };
 
 
@@ -22,19 +23,19 @@ main (int argc, char *argv[]) {
     int rank, size;
     signed char c;
     char testname[32];
-    char testargs[200];
+    char testoptions[200];
 
-    testname[0] = testargs[0] = '\0';
-    while ((c = getopt(argc, argv, "t:a:")) != -1) {
+    testname[0] = testoptions[0] = '\0';
+    while ((c = getopt(argc, argv, "t:o:")) != -1) {
         switch (c) {
 	    case 't':
 		strncpy (testname, optarg, sizeof(testname) - 1);
 		testname[sizeof(testname)-1] = '\0';
 		break;
-	    case 'a':
-		strncpy (testargs, optarg, sizeof(testargs) - 1);
-		testargs[sizeof(testargs)-1] = '\0';
-		assert ((strlen (testargs) < (sizeof(testargs) - 1)) && "Test arguments too long, increase size of testargs");
+	    case 'o':
+		strncpy (testoptions, optarg, sizeof(testoptions) - 1);
+		testoptions[sizeof(testoptions)-1] = '\0';
+		assert ((strlen (testoptions) < (sizeof(testoptions) - 1)) && "Test arguments too long, increase size of testoptions");
 		break;
 	    default:
 	        fprintf (stderr, "Must provide test name\n");
@@ -48,7 +49,7 @@ main (int argc, char *argv[]) {
 
     for (int i = 0; i < sizeof(tests)/sizeof(Test); i++)
 	if (0 == strcmp (testname, tests[i].name))
-	    tests[i].func (rank, size, testargs);
+	    tests[i].func (rank, size, testoptions);
 
     MPI_Finalize ();
     return 0;
