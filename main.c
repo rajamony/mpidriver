@@ -49,8 +49,11 @@ main (int argc, char *argv[]) {
     MPI_Comm_size (MPI_COMM_WORLD, &size);
 
     for (int i = 0; i < sizeof(tests)/sizeof(Test); i++)
-	if (0 == strcmp (testname, tests[i].name))
+	if (0 == strcmp (testname, tests[i].name)) {
+	    MPI_Barrier (MPI_COMM_WORLD);
 	    tests[i].func (rank, size, testoptions);
+	    break;
+	}
 
     MPI_Finalize ();
     return 0;
