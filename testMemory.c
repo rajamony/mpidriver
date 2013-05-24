@@ -6,15 +6,17 @@
 #include "tests.h"
 #include "utils.h"
 
-static int vectorsize = 100*1000000;
+#define VECTORSIZE	(100 * 1000000)
+
 static double runtime = 15;
 static int numrounds = 1;
+static uint64_t numiterations = 0;
 static double copyGBs, scaleGBs, addGBs, triadGBs;
 
 static void myparser (int c) {
     switch (c) {
-	case 'l':
-	    vectorsize = strtol (optarg, NULL, 0);
+	case 'n':
+	    numiterations = strtol (optarg, NULL, 0);
 	    break;
 	case 't':
 	    runtime = strtof (optarg, NULL);
@@ -32,7 +34,7 @@ static void myparser (int c) {
 static int kernel (uint64_t n) {
     int failure;
     for (uint64_t i = 0; i < n; i++)
-	HPCC_Stream (vectorsize, 0, &copyGBs, &scaleGBs, &addGBs, &triadGBs, &failure);
+	HPCC_Stream (VECTORSIZE, 0, &copyGBs, &scaleGBs, &addGBs, &triadGBs, &failure);
     return (int) (copyGBs + scaleGBs + addGBs + triadGBs);
 }
 
@@ -42,7 +44,11 @@ testMemory (int taskid, int numtasks, char *options) {
     int x = 0;
     printf ( "Testing memory - this is task %d of %d. Options <%s>\n", taskid, numtasks, options);
     parseOptions (options, myparser);
-    uint64_t numiterations = mapRuntimeToIterationcount (runtime, kernel);
+    if ((runtime != 0) && numiterations) {
+        fprintf (stderr, "testMemory: Only one of iteration count OR runtime can be specified\n");
+	exit (-1);
+    }
+    numiterations = mapRuntimeToIterationcount (runtime, kernel);
 
     for (int i = 0; i < numrounds; i++) {
 	double starttime = MPI_Wtime();

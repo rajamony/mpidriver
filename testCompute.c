@@ -9,8 +9,9 @@
 #include "tests.h"
 #include "utils.h"
 
-static double runtime = 15;
+static double runtime = 0;
 static int numrounds = 1;
+static uint64_t numiterations = 0;
 
 static void myparser (int c) {
     switch (c) {
@@ -19,6 +20,9 @@ static void myparser (int c) {
 	    break;
 	case 'r':
 	    numrounds = strtol (optarg, NULL, 0);
+	    break;
+	case 'n':
+	    numiterations = strtoull (optarg, NULL, 0);
 	    break;
 	default:
 	    fprintf (stderr, "Must provide valid arguments\n");
@@ -44,7 +48,11 @@ void
 testCompute (int taskid, int numtasks, char *options) {
     printf ( "Testing compute - this is task %d of %d. Options <%s>\n", taskid, numtasks, options);
     parseOptions (options, myparser);
-    uint64_t numiterations = mapRuntimeToIterationcount (runtime, kernel);
+    if ((runtime != 0) && numiterations) {
+        fprintf (stderr, "testCompute: Only one of iteration count OR runtime can be specified\n");
+	exit (-1);
+    }
+    numiterations = mapRuntimeToIterationcount (runtime, kernel);
 
     for (int i = 0; i < numrounds; i++) {
 	double starttime = MPI_Wtime();
