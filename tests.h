@@ -8,4 +8,6 @@ int HPCC_Stream(int vectorsize, int doIO, double *copyGBs, double *scaleGBs, dou
 
 void testCompute (int taskid, int numtasks, char *testargs);
 
+void testInterconnect (int taskid, int numtasks, char *testargs);
+
 #endif /* __TESTS_H__ */

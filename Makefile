@@ -1,7 +1,7 @@
 CC = mpicc
 CFLAGS = -g -O -Wall -std=gnu99 -fopenmp -MMD
 
-OBJS = main.o testHello.o testMemory.o stream.o testCompute.o
+OBJS = main.o testHello.o testMemory.o stream.o testCompute.o testInterconnect.o
 
 driver:	$(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS)
@@ -16,6 +16,9 @@ runmemory:
 
 runcompute:
 	mpirun -np 1 driver -t compute -o "-i4"
+
+runinterconnect:
+	mpirun -np 1 driver -t interconnect -o "-i4"
 
 clean:
 	-rm -f $(OBJS)

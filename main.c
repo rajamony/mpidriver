@@ -12,9 +12,10 @@ typedef struct {
 } Test;
 
 Test tests[] = {
-	{"helloworld",	testHello},
-	{"memory", 	testMemory},
-	{"compute", 	testCompute},
+	{"helloworld",		testHello},
+	{"memory", 		testMemory},
+	{"compute", 		testCompute},
+	{"interconnect", 	testInterconnect},
     };
 
 
