@@ -63,14 +63,14 @@ uint64_t mapRuntimeToIterationcount (double runtime, int (*func)(uint64_t numite
 }
 
 
-void parseOptions (const char *options, void (*parser) (int)) {
+void parseOptions (const char *options, const char *optstring, void (*parser) (int)) {
     signed char c;
     wordexp_t wep;
     optind = 1;	// rewind getopt
     wordexp ("dummy", &wep, 0);      // Get argv[0] out of the way
     wordexp (options, &wep, WRDE_NOCMD | WRDE_APPEND);
 
-    while ((c = getopt(wep.we_wordc, wep.we_wordv, "t:r:i:")) != -1)
+    while ((c = getopt(wep.we_wordc, wep.we_wordv, optstring)) != -1)
         (*parser) (c);
 
     wordfree (&wep);

@@ -65,12 +65,13 @@ void
 testCompute (FILE *of, int taskid, int numtasks, char *options) {
     outputfile = of;
     fprintf (outputfile, "Testing compute - this is task %d of %d. Options <%s>\n", taskid, numtasks, options);
-    parseOptions (options, myparser);
+    parseOptions (options, "t:r:n", myparser);
     if ((runtime != 0) && numiterations) {
         fprintf (outputfile, "testCompute: Only one of iteration count OR runtime can be specified\n");
 	exit (-1);
     }
-    numiterations = mapRuntimeToIterationcount (runtime, kernel);
+    if (numiterations == 0)
+	numiterations = mapRuntimeToIterationcount (runtime, kernel);
 
     for (int i = 0; i < numrounds; i++) {
 	double starttime = MPI_Wtime();

@@ -61,12 +61,13 @@ testMemory (FILE *of, int taskid, int numtasks, char *options) {
     int x = 0;
     outputfile = of;
     fprintf (outputfile, "Testing memory - this is task %d of %d. Options <%s>\n", taskid, numtasks, options);
-    parseOptions (options, myparser);
+    parseOptions (options, "t:r:n:", myparser);
     if ((runtime != 0) && numiterations) {
         fprintf (outputfile, "testMemory: Only one of iteration count OR runtime can be specified\n");
 	exit (-1);
     }
-    numiterations = mapRuntimeToIterationcount (runtime, kernel);
+    if (numiterations == 0)
+	numiterations = mapRuntimeToIterationcount (runtime, kernel);
 
     for (int i = 0; i < numrounds; i++) {
 	double starttime = MPI_Wtime();
