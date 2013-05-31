@@ -3,16 +3,18 @@ CFLAGS = -g -O -Wall -std=gnu99 -fopenmp -MMD
 
 OBJS = main.o testHello.o testMemory.o stream.o testCompute.o testInterconnect.o utils.o
 
+all:	driver
+
 driver:	$(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS)
 
 run: runmemory
 
 runhello:
-	mpirun -np 4 driver -t helloworld
+	mpirun -np 1 driver -t helloworld
 
 runmemory:
-	mpirun -np 4 driver -t memory -o "-t23 -r4"
+	mpirun -np 1 driver -t memory -o "-t23 -r4"
 
 runcompute:
 	mpirun -np 1 driver -t compute -o "-t13 -r10"
@@ -24,3 +26,4 @@ clean:
 	-rm -f $(OBJS)
 
 -include *.d
+
