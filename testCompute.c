@@ -25,7 +25,7 @@
 #include "tests.h"
 #include "utils.h"
 
-static double runtime = 0;
+static double runtime = 0, expectation = 1e100;
 static int numrounds = 1;
 static uint64_t numiterations = 0;
 static FILE *outputfile = NULL;
@@ -37,6 +37,9 @@ static void myparser (int c) {
 	    break;
 	case 'r':
 	    numrounds = strtol (optarg, NULL, 0);
+	    break;
+	case 'e':
+	    expectation = strtof (optarg, NULL);
 	    break;
 	case 'n':
 	    numiterations = strtoull (optarg, NULL, 0);
@@ -63,9 +66,10 @@ static int kernel (uint64_t n) {
 
 void
 testCompute (FILE *of, int taskid, int numtasks, char *options) {
+    int x = 0;
     outputfile = of;
     fprintf (outputfile, "Testing compute - this is task %d of %d. Options <%s>\n", taskid, numtasks, options);
-    parseOptions (options, "t:r:n", myparser);
+    parseOptions (options, "t:r:n:e:", myparser);
     if ((runtime != 0) && numiterations) {
         fprintf (outputfile, "testCompute: Only one of iteration count OR runtime can be specified\n");
 	exit (-1);
@@ -76,9 +80,14 @@ testCompute (FILE *of, int taskid, int numtasks, char *options) {
     for (int i = 0; i < numrounds; i++) {
 	double starttime = MPI_Wtime();
 	MPI_Barrier (MPI_COMM_WORLD);
-	kernel (numiterations);
+	x += kernel (numiterations);
 	MPI_Barrier (MPI_COMM_WORLD);
-	if (taskid == 0)
-	    fprintf (outputfile, "Iteration %3d (of %3d) took %.1f seconds\n", i, numrounds, MPI_Wtime() - starttime);
+	double endtime = MPI_Wtime();
+	if (taskid == 0) {
+	    fprintf (outputfile, "Iteration %3d (of %3d) took %.1f seconds (dummy = %d)\n", i, numrounds, endtime - starttime, x);
+	    if ((endtime - starttime) > expectation)
+	        exitUnhappily("too long");
+	}
+	MPI_Barrier (MPI_COMM_WORLD);
     }
 }

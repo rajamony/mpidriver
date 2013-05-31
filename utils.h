@@ -19,5 +19,6 @@
 
 uint64_t mapRuntimeToIterationcount (double runtime, int (*func)(uint64_t numiterations));
 void parseOptions (const char *options, const char *optstring, void (*parser) (int));
+void exitUnhappily (const char *because);
 
 #endif /* __UTILS_H__ */

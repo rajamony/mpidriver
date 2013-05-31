@@ -26,7 +26,7 @@
 #define ESTIMATE_FACTOR		16
 #define SEED_NUMITERATIONS	1			/* Note - we double this before using */
 #define MAX_RUNTIME		((double) (15*60))	/* mapRuntimeToIterationcount won't attempt to find an iteration count for runtimes greater than this*/
-#define MIN_RUNTIME		((double) (10))		/* mapRuntimeToIterationcount won't attempt to find an iteration count for runtimes smaller than this*/
+#define MIN_RUNTIME		((double) (3))		/* mapRuntimeToIterationcount won't attempt to find an iteration count for runtimes smaller than this*/
 
 static FILE *outputfile = NULL;
 
@@ -74,6 +74,14 @@ void parseOptions (const char *options, const char *optstring, void (*parser) (i
         (*parser) (c);
 
     wordfree (&wep);
+}
+
+
+void exitUnhappily (const char *because) {
+    FILE *fp = fopen ("unhappy", "w+");
+    fprintf (fp, "i am not happy because %s\n", because);
+    // MPI_Abort (MPI_COMM_WORLD, 0);
+    exit (0);
 }
 
 #if 0
