@@ -12,7 +12,7 @@ runhello:
 	mpirun -np 4 driver -t helloworld
 
 runmemory:
-	mpirun -np 1 driver -t memory -o "-t23 -r4"
+	mpirun -np 4 driver -t memory -o "-t23 -r4"
 
 runcompute:
 	mpirun -np 1 driver -t compute -o "-t13 -r10"
