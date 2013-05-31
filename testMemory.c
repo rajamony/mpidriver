@@ -22,7 +22,7 @@
 #include "tests.h"
 #include "utils.h"
 
-#define VECTORSIZE	(50 * 1000000)
+#define VECTORSIZE	(200 * 1000000)
 
 static double runtime = 0, expectation = 1e100;
 static int numrounds = 1;

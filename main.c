@@ -53,10 +53,12 @@ main (int argc, char *argv[]) {
     }
     assert (outfile);
 
-    InitUtilsOutput (outfile);
     testname[0] = testoptions[0] = '\0';
-    while ((c = getopt(argc, argv, "t:o:")) != -1) {
+    while ((c = getopt(argc, argv, "dt:o:")) != -1) {
         switch (c) {
+	    case 'd':
+ 		outfile = stderr;
+		break;
 	    case 't':
 		strncpy (testname, optarg, sizeof(testname) - 1);
 		testname[sizeof(testname)-1] = '\0';
@@ -71,6 +73,7 @@ main (int argc, char *argv[]) {
 		exit (-1);
 	}
     }
+    InitUtilsOutput (outfile);
 
     MPI_Init (&argc, &argv);
     MPI_Comm_rank (MPI_COMM_WORLD, &rank);

@@ -85,7 +85,7 @@
 
 static int VectorSize;
 # define N 2000000
-# define NTIMES 10
+# define NTIMES 2
 # define OFFSET 0
 
 /*

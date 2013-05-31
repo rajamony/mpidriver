@@ -14,10 +14,10 @@ runhello:
 	mpirun -np 1 driver -t helloworld 
 
 runmemory:
-	mpirun -np 1 driver -t memory -o "-t5 -r4" 
+	mpirun -np 1 driver -t memory -o "-n1 -r30 -e5" 
 
 runcompute:
-	mpirun -np 1 driver -t compute -o "-t13 -r10" 
+	mpirun -np 1 driver -t compute -o "-n1541519990 -r30 -e4" 
 
 runinterconnect:
 	mpirun -np 1 driver -t interconnect -o "-i4" 
