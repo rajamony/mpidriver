@@ -46,7 +46,7 @@ main (int argc, char *argv[]) {
     signed char c;
     char testname[32];
     char testoptions[200];
-    FILE *outfile = fopen (OUTPUTFILE, "w+");
+    FILE *outfile = fopen (OUTPUTFILE, "a");
 
     if (outfile == NULL) {
         perror ("file open");

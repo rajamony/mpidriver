@@ -72,7 +72,8 @@ testMemory (FILE *of, int taskid, int numtasks, char *options) {
     if (numiterations == 0)
 	numiterations = mapRuntimeToIterationcount (runtime, kernel);
 
-    for (int i = 0; i < numrounds; i++) {
+    int startround = readRestartFile ();
+    for (int i = startround; i < numrounds; i++) {
 	double starttime = MPI_Wtime();
 	MPI_Barrier (MPI_COMM_WORLD);
 	x += kernel (numiterations);
@@ -82,7 +83,7 @@ testMemory (FILE *of, int taskid, int numtasks, char *options) {
 	    fprintf (outputfile, "Iteration %3d (of %3d), time = %.1f seconds, bandwidths: %7.3f %7.3f %7.3f %7.3f (dummy = %d)\n", i,
 	    			numrounds, MPI_Wtime() - starttime, copyGBs, scaleGBs, addGBs, triadGBs, x);
 	    if ((endtime - starttime) > expectation)
-	        exitUnhappily("too long");
+	        exitUnhappily (i+1, "too long");
 	}
 	MPI_Barrier (MPI_COMM_WORLD);
     }

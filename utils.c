@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include "utils.h"
 
+#define RESTARTFILE		"RESTARTFILE.txt"
 #define ESTIMATE_FACTOR		16
 #define SEED_NUMITERATIONS	1			/* Note - we double this before using */
 #define MAX_RUNTIME		((double) (15*60))	/* mapRuntimeToIterationcount won't attempt to find an iteration count for runtimes greater than this*/
@@ -76,10 +77,27 @@ void parseOptions (const char *options, const char *optstring, void (*parser) (i
     wordfree (&wep);
 }
 
+int readRestartFile() {
+    FILE *rf = fopen (RESTARTFILE, "r");
+    int startround = 0;
+    if (rf != NULL) {
+        fscanf (rf, "%d", &startround);
+	fclose (rf);
+    }
+    return startround;
+}
 
-void exitUnhappily (const char *because) {
+
+void exitUnhappily (int restartvalue, const char *because) {
+    FILE *rf = fopen (RESTARTFILE, "w");
+    if (rf != NULL)
+        fprintf (rf, "%d", restartvalue);
+    fclose (rf);
+
     FILE *fp = fopen ("unhappy", "w+");
     fprintf (fp, "i am not happy because %s\n", because);
+    fclose (fp);
+
     // MPI_Abort (MPI_COMM_WORLD, 0);
     exit (0);
 }

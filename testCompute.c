@@ -77,7 +77,8 @@ testCompute (FILE *of, int taskid, int numtasks, char *options) {
     if (numiterations == 0)
 	numiterations = mapRuntimeToIterationcount (runtime, kernel);
 
-    for (int i = 0; i < numrounds; i++) {
+    int startround = readRestartFile ();
+    for (int i = startround; i < numrounds; i++) {
 	double starttime = MPI_Wtime();
 	MPI_Barrier (MPI_COMM_WORLD);
 	x += kernel (numiterations);
@@ -86,7 +87,7 @@ testCompute (FILE *of, int taskid, int numtasks, char *options) {
 	if (taskid == 0) {
 	    fprintf (outputfile, "Iteration %3d (of %3d) took %.1f seconds (dummy = %d)\n", i, numrounds, endtime - starttime, x);
 	    if ((endtime - starttime) > expectation)
-	        exitUnhappily("too long");
+	        exitUnhappily (i+1, "too long");
 	}
 	MPI_Barrier (MPI_COMM_WORLD);
     }
