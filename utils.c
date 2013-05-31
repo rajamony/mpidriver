@@ -28,6 +28,11 @@
 #define MAX_RUNTIME		((double) (15*60))	/* mapRuntimeToIterationcount won't attempt to find an iteration count for runtimes greater than this*/
 #define MIN_RUNTIME		((double) (10))		/* mapRuntimeToIterationcount won't attempt to find an iteration count for runtimes smaller than this*/
 
+static FILE *outputfile = NULL;
+
+void InitUtilsOutput (FILE *of) {
+    outputfile = of;	// What an ugly hack!
+}
 
 // Call func with an ever-increasing iteration count until we have consumed 1/ESTIMATE_FACTOR of the desired runtime.
 uint64_t mapRuntimeToIterationcount (double runtime, int (*func)(uint64_t numiterations)) {
@@ -36,7 +41,7 @@ uint64_t mapRuntimeToIterationcount (double runtime, int (*func)(uint64_t numite
     int dummy = 0;
 
     if (runtime > MAX_RUNTIME || runtime < MIN_RUNTIME) { // Sanity check
-	fprintf (stderr, "Provided runtime %f must be in range (%f,%f)\n", runtime, MIN_RUNTIME, MAX_RUNTIME);
+	fprintf (outputfile, "Provided runtime %f must be in range (%f,%f)\n", runtime, MIN_RUNTIME, MAX_RUNTIME);
 	exit (-1);
     }
 
@@ -45,7 +50,7 @@ uint64_t mapRuntimeToIterationcount (double runtime, int (*func)(uint64_t numite
 	double starttime = MPI_Wtime();
 	dummy += (*func) (numiterations);
 	delta = MPI_Wtime() - starttime;
-	// fprintf (stdout, "mapRuntimeToIterationcount: %.3f seconds --> iteration-count of %lu\n", delta, numiterations);
+	// fprintf (outputfile, "mapRuntimeToIterationcount: %.3f seconds --> iteration-count of %lu\n", delta, numiterations);
 	numiterations *= 2;
     } while (delta < checkruntime);
     numiterations /= 2;
@@ -53,7 +58,7 @@ uint64_t mapRuntimeToIterationcount (double runtime, int (*func)(uint64_t numite
     double frac = runtime / delta + ((dummy > 0) ? 1e-6 : 2e-6);
     if (frac < 1) frac = 1;
     uint64_t ret = (uint64_t) (numiterations * frac);
-    fprintf (stdout, "mapRuntimeToIterationcount: delta = %.3f, frac = %f, estimating %lu iterations for %.0f seconds runtime\n", delta, frac, ret, runtime);
+    fprintf (outputfile, "mapRuntimeToIterationcount: delta = %.3f, frac = %f, estimating %lu iterations for %.0f seconds runtime\n", delta, frac, ret, runtime);
     return ret;
 }
 
@@ -94,7 +99,7 @@ int main (int argc, char **argv) {
 		runtime = atof (optarg);
 		break;
 	    default:
-	        fprintf (stderr, "Can only provide runtime as option\n");
+	        fprintf (outputfile, "Can only provide runtime as option\n");
 		exit (-1);
 	}
     }
@@ -103,7 +108,7 @@ int main (int argc, char **argv) {
 
     double start = MPI_Wtime();
     int x = runnerfunc (num);
-    fprintf (stderr, "Discovered that %f seconds runtime maps to %llu iterations. Verified runtime is %f seconds (dummy %d)\n", runtime, num, MPI_Wtime() - start, x); 
+    fprintf (outputfile, "Discovered that %f seconds runtime maps to %llu iterations. Verified runtime is %f seconds (dummy %d)\n", runtime, num, MPI_Wtime() - start, x); 
 }
 
 #endif

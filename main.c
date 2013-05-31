@@ -17,14 +17,19 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
+#include <errno.h>
 #include <unistd.h>
 #include <string.h>
 #include <mpi.h>
+#include <stdint.h>
 #include "tests.h"
+#include "utils.h"
+
+#define OUTPUTFILE	"OUT.txt"
 
 typedef struct {
     char *name;
-    void (*func) (int taskid, int numtasks, char *args);
+    void (*func) (FILE *of, int taskid, int numtasks, char *args);
 } Test;
 
 Test tests[] = {
@@ -41,7 +46,14 @@ main (int argc, char *argv[]) {
     signed char c;
     char testname[32];
     char testoptions[200];
+    FILE *outfile = fopen (OUTPUTFILE, "w+");
 
+    if (outfile == NULL) {
+        perror ("file open");
+    }
+    assert (outfile);
+
+    InitUtilsOutput (outfile);
     testname[0] = testoptions[0] = '\0';
     while ((c = getopt(argc, argv, "t:o:")) != -1) {
         switch (c) {
@@ -55,7 +67,7 @@ main (int argc, char *argv[]) {
 		assert ((strlen (testoptions) < (sizeof(testoptions) - 1)) && "Test arguments too long, increase size of testoptions");
 		break;
 	    default:
-	        fprintf (stderr, "Must provide test name\n");
+	        fprintf (outfile, "Must provide test name\n");
 		exit (-1);
 	}
     }
@@ -67,10 +79,11 @@ main (int argc, char *argv[]) {
     for (int i = 0; i < sizeof(tests)/sizeof(Test); i++)
 	if (0 == strcmp (testname, tests[i].name)) {
 	    MPI_Barrier (MPI_COMM_WORLD);
-	    tests[i].func (rank, size, testoptions);
+	    tests[i].func (outfile, rank, size, testoptions);
 	    break;
 	}
 
+    fclose (outfile);
     MPI_Finalize ();
     return 0;
 }

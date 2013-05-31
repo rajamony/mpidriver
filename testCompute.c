@@ -28,6 +28,7 @@
 static double runtime = 0;
 static int numrounds = 1;
 static uint64_t numiterations = 0;
+static FILE *outputfile = NULL;
 
 static void myparser (int c) {
     switch (c) {
@@ -41,7 +42,7 @@ static void myparser (int c) {
 	    numiterations = strtoull (optarg, NULL, 0);
 	    break;
 	default:
-	    fprintf (stderr, "Must provide valid arguments\n");
+	    fprintf (outputfile, "Must provide valid arguments\n");
 	    exit (-1);
     }
 }
@@ -61,11 +62,12 @@ static int kernel (uint64_t n) {
 
 
 void
-testCompute (int taskid, int numtasks, char *options) {
-    printf ( "Testing compute - this is task %d of %d. Options <%s>\n", taskid, numtasks, options);
+testCompute (FILE *of, int taskid, int numtasks, char *options) {
+    outputfile = of;
+    fprintf (outputfile, "Testing compute - this is task %d of %d. Options <%s>\n", taskid, numtasks, options);
     parseOptions (options, myparser);
     if ((runtime != 0) && numiterations) {
-        fprintf (stderr, "testCompute: Only one of iteration count OR runtime can be specified\n");
+        fprintf (outputfile, "testCompute: Only one of iteration count OR runtime can be specified\n");
 	exit (-1);
     }
     numiterations = mapRuntimeToIterationcount (runtime, kernel);
@@ -76,6 +78,6 @@ testCompute (int taskid, int numtasks, char *options) {
 	kernel (numiterations);
 	MPI_Barrier (MPI_COMM_WORLD);
 	if (taskid == 0)
-	    fprintf (stdout, "Iteration %3d (of %3d) took %.1f seconds\n", i, numrounds, MPI_Wtime() - starttime);
+	    fprintf (outputfile, "Iteration %3d (of %3d) took %.1f seconds\n", i, numrounds, MPI_Wtime() - starttime);
     }
 }
